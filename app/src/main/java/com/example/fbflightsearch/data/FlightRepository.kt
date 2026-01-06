@@ -15,28 +15,38 @@ class FlightRepository(
     /**
      * Search airports by IATA code starting with the given query
      */
-    fun searchAirports(query: String): List<Airport> {
+    suspend fun searchAirports(query: String): List<Airport> {
         return airportDao.getAirportByCodeStartingWith(query)
     }
 
     /**
      * Search airports by name containing the query
      */
-    fun searchAirportsByName(query: String): List<Airport> {
+    suspend fun searchAirportsByName(query: String): List<Airport> {
         return airportDao.searchAirportsByName(query)
     }
 
     /**
      * Get flights from a specific departure airport
      */
-    fun getFlightsFromAirport(departureAirportId: Int): List<Airport> {
+    suspend fun getFlightsFromAirport(departureAirportId: Int): List<Airport> {
         return airportDao.getDestinations(departureAirportId)
+    }
+
+    /**
+     * Search airports combining both code and name search
+     */
+    suspend fun searchAirportsCombined(query: String): List<Airport> {
+        val byCode = airportDao.getAirportByCodeStartingWith(query)
+        val byName = airportDao.searchAirportsByName(query)
+        // Combine and remove duplicates
+        return (byCode + byName).distinctBy { it.id }
     }
 
     /**
      * Get all favorite routes
      */
-    fun getAllFavorites(): List<Favorite> {
+    suspend fun getAllFavorites(): List<Favorite> {
         return favoriteDao.getAllFavorites()
     }
 
@@ -55,7 +65,7 @@ class FlightRepository(
     }
 
     /**
-     * Get favorite count
+     * Get favorite by route
      */
     suspend fun getFavorite(departureCode: String, destinationCode: String): Favorite? {
         return favoriteDao.getFavorite(departureCode, destinationCode)

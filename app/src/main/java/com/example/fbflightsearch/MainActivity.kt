@@ -9,22 +9,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.fbflightsearch.data.AppDatabase
 import com.example.fbflightsearch.data.DataStoreManager
-import com.example.fbflightsearch.data.DatabaseInitializer
 import com.example.fbflightsearch.data.FlightRepository
 import com.example.fbflightsearch.ui.FlightSearchScreen
 import com.example.fbflightsearch.ui.theme.FBFlightSearchTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 /**
  * Main Activity for the Flight Search App
  */
 class MainActivity : ComponentActivity() {
-
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private lateinit var database: AppDatabase
     private lateinit var repository: FlightRepository
@@ -49,12 +42,6 @@ class MainActivity : ComponentActivity() {
 
         // Initialize ViewModelFactory
         viewModelFactory = FlightSearchViewModelFactory(repository)
-
-        // Load airport data in background
-        applicationScope.launch {
-            val databaseInitializer = DatabaseInitializer(this@MainActivity, database)
-            databaseInitializer.loadAirportsFromAsset()
-        }
 
         setContent {
             FBFlightSearchTheme {

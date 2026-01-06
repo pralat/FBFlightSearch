@@ -35,19 +35,17 @@ class FlightSearchViewModel(
     private val _favorites = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     val favorites: StateFlow<Map<String, Boolean>> = _favorites.asStateFlow()
 
-    init {
-        loadFavorites()
-    }
-
     /**
      * Update search query and fetch suggestions
      */
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
-        _suggestions.value = if (query.length >= 2) {
-            repository.searchAirports(query) + repository.searchAirportsByName(query)
+        if (query.length >= 2) {
+            viewModelScope.launch {
+                _suggestions.value = repository.searchAirportsCombined(query)
+            }
         } else {
-            emptyList()
+            _suggestions.value = emptyList()
         }
     }
 
@@ -58,7 +56,10 @@ class FlightSearchViewModel(
         _selectedAirport.value = airport
         _searchQuery.value = "${airport.iataCode} - ${airport.name}"
         _suggestions.value = emptyList()
-        _destinations.value = repository.getFlightsFromAirport(airport.id)
+
+        viewModelScope.launch {
+            _destinations.value = repository.getFlightsFromAirport(airport.id)
+        }
     }
 
     /**

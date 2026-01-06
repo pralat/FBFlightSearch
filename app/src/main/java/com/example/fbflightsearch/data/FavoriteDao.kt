@@ -15,7 +15,7 @@ interface FavoriteDao {
      * Get all favorites
      */
     @Query("SELECT * FROM favorite")
-    fun getAllFavorites(): List<Favorite>
+    suspend fun getAllFavorites(): List<Favorite>
 
     /**
      * Check if a route is favorited

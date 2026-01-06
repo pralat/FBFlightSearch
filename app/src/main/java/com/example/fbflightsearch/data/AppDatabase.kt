@@ -32,6 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "flight_search_database"
                 )
+                    .createFromAsset("database/flight_search.db")
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { INSTANCE = it }
