@@ -1,0 +1,31 @@
+id,name,iata_code,passengers,destinations
+1,Hartsfield-Jackson Atlanta International Airport,ATL,110531300,239
+2,Los Angeles International Airport,LAX,88704038,101
+3,O'Hare International Airport,ORD,83862259,228
+4,Dallas/Fort Worth International Airport,DFW,79390368,229
+5,Denver International Airport,DEN,77827545,202
+6,John F. Kennedy International Airport,JFK,63846994,150
+7,San Francisco International Airport,SFO,57192163,95
+8,Seattle-Tacoma International Airport,SEA,50868154,96
+9,Miami International Airport,MIA,49074279,130
+10,Orlando International Airport,MCO,47393041,87
+11,Newark Liberty International Airport,EWR,43582211,172
+12,Charlotte Douglas International Airport,CLT,43373437,182
+13,Phoenix Sky Harbor International Airport,PHX,42652516,139
+14,George Bush Intercontinental Airport,IAH,43560723,187
+15,LaGuardia Airport,LGA,29793281,79
+16,Fort Lauderdale-Hollywood International Airport,FLL,35863528,79
+17,Hong Kong International Airport,HKG,74840500,119
+18,Beijing Capital International Airport,PEK,100011000,103
+19,Shanghai Pudong International Airport,PVG,74006600,260
+20,Dubai International Airport,DXB,89149000,262
+21,Tokyo Haneda Airport,HND,85489200,85
+22,Heathrow Airport,LHR,80883600,185
+23,Charles de Gaulle Airport,CDG,76150000,294
+24,Schiphol Airport,AMS,71855000,225
+25,Singapore Changi Airport,SIN,68280000,142
+26,Suvarnabhumi Airport,BKK,60861156,136
+27,Incheon International Airport,ICN,70273350,90
+28,Frankfurt Airport,FRA,64582000,295
+29,Istanbul Airport,IST,76400000,309
+30,Toronto Pearson International Airport,YYZ,50491790,184
