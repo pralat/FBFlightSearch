@@ -3,14 +3,14 @@ package com.example.fbflightsearch.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * DataStore keys for storing user preferences
+ * DataStore for storing user preferences
  */
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
@@ -21,28 +21,34 @@ class DataStoreManager(context: Context) {
 
     private val dataStore = context.dataStore
 
+    companion object {
+        private val SEARCH_QUERY_KEY = stringPreferencesKey("search_query")
+    }
+
     /**
-     * Check if a route is favorited by combining departure and destination codes
+     * Get the saved search query
      */
-    fun isRouteFavorited(departureCode: String, destinationCode: String): Flow<Boolean> {
+    fun getSearchQuery(): Flow<String> {
         return dataStore.data.map { preferences ->
-            preferences[booleanPreferencesKey("${departureCode}_$destinationCode")] ?: false
+            preferences[SEARCH_QUERY_KEY] ?: ""
         }
     }
 
     /**
-     * Set a route as favorited or unfavorited
+     * Save the search query
      */
-    suspend fun toggleFavorite(departureCode: String, destinationCode: String, isFavorite: Boolean) {
+    suspend fun setSearchQuery(query: String) {
         dataStore.edit { preferences ->
-            preferences[booleanPreferencesKey("${departureCode}_$destinationCode")] = isFavorite
+            preferences[SEARCH_QUERY_KEY] = query
         }
     }
 
     /**
-     * Clear all favorites
+     * Clear the search query
      */
-    suspend fun clearAllFavorites() {
-        dataStore.edit { it.clear() }
+    suspend fun clearSearchQuery() {
+        dataStore.edit { preferences ->
+            preferences.remove(SEARCH_QUERY_KEY)
+        }
     }
 }

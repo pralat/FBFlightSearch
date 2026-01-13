@@ -2,8 +2,6 @@ package com.example.fbflightsearch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.fbflightsearch.data.AppDatabase
-import com.example.fbflightsearch.data.DataStoreManager
 import com.example.fbflightsearch.data.FlightRepository
 
 /**

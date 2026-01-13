@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -79,14 +80,16 @@ fun FlightSearchScreen(
                 .padding(paddingValues)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Search Box
-                SearchBox(
-                    query = searchQuery,
-                    onQueryChanged = { viewModel.onSearchQueryChanged(it) },
-                    onClearClick = { viewModel.onClearSelection() }
-                )
+                // Search Box - only show when not viewing flight results
+                if (selectedAirport == null) {
+                    SearchBox(
+                        query = searchQuery,
+                        onQueryChanged = { viewModel.onSearchQueryChanged(it) },
+                        onClearClick = { viewModel.onSearchQueryChanged("") }
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Suggestions or Destinations
                 when {
@@ -106,6 +109,7 @@ fun FlightSearchScreen(
                         FlightsList(
                             departureAirport = airport,
                             destinations = destinations,
+                            onBackClick = { viewModel.onClearSelection() },
                             onToggleFavorite = { dep, dest ->
                                 viewModel.onToggleFavorite(dep, dest)
                             },
@@ -251,6 +255,7 @@ fun AirportItem(
 fun FlightsList(
     departureAirport: Airport,
     destinations: List<Airport>,
+    onBackClick: () -> Unit,
     onToggleFavorite: (String, String) -> Unit,
     isRouteFavorited: (String, String) -> Boolean
 ) {
@@ -259,11 +264,22 @@ fun FlightsList(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Text(
-            text = "Flights from ${departureAirport.iataCode}",
-            style = MaterialTheme.typography.titleLarge,
+        // Header with back button
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 16.dp)
-        )
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+            Text(
+                text = "Flights from ${departureAirport.iataCode}",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)

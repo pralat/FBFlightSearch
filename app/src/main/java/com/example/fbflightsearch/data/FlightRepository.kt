@@ -44,6 +44,27 @@ class FlightRepository(
     }
 
     /**
+     * Get search query from DataStore
+     */
+    fun getSearchQuery(): Flow<String> {
+        return dataStoreManager.getSearchQuery()
+    }
+
+    /**
+     * Save search query to DataStore
+     */
+    suspend fun setSearchQuery(query: String) {
+        dataStoreManager.setSearchQuery(query)
+    }
+
+    /**
+     * Clear search query from DataStore
+     */
+    suspend fun clearSearchQuery() {
+        dataStoreManager.clearSearchQuery()
+    }
+
+    /**
      * Get all favorite routes
      */
     suspend fun getAllFavorites(): List<Favorite> {
@@ -53,15 +74,21 @@ class FlightRepository(
     /**
      * Check if a route is favorited
      */
-    fun isRouteFavorited(departureCode: String, destinationCode: String): Flow<Boolean> {
-        return dataStoreManager.isRouteFavorited(departureCode, destinationCode)
+    suspend fun isRouteFavorited(departureCode: String, destinationCode: String): Boolean {
+        return favoriteDao.getFavorite(departureCode, destinationCode) != null
     }
 
     /**
      * Toggle favorite status for a route
      */
     suspend fun toggleFavorite(departureCode: String, destinationCode: String, isFavorite: Boolean) {
-        dataStoreManager.toggleFavorite(departureCode, destinationCode, isFavorite)
+        if (isFavorite) {
+            favoriteDao.insertFavorite(Favorite(departureCode = departureCode, destinationCode = destinationCode))
+        } else {
+            favoriteDao.getFavorite(departureCode, destinationCode)?.let {
+                favoriteDao.deleteFavorite(it)
+            }
+        }
     }
 
     /**

@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         // Initialize database
         database = AppDatabase.getDatabase(this)
 
-        // Initialize DataStore
+        // Initialize DataStore for search query persistence
         val dataStoreManager = DataStoreManager(this)
 
         // Initialize repository
