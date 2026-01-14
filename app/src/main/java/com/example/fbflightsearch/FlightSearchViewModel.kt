@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fbflightsearch.data.Airport
 import com.example.fbflightsearch.data.FlightRepository
+import com.example.fbflightsearch.data.Favorite
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,9 +32,13 @@ class FlightSearchViewModel(
     private val _destinations = MutableStateFlow<List<Airport>>(emptyList())
     val destinations: StateFlow<List<Airport>> = _destinations.asStateFlow()
 
-    // Favorite routes
+    // Favorite routes and favorite destinations
     private val _favorites = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     val favorites: StateFlow<Map<String, Boolean>> = _favorites.asStateFlow()
+
+    // Pair of departure and destination airports for each favorite route
+    private val _favoriteDestinations = MutableStateFlow<List<Pair<Airport, Airport>>>(emptyList())
+    val favoriteDestinations: StateFlow<List<Pair<Airport, Airport>>> = _favoriteDestinations.asStateFlow()
 
     init {
         loadSavedSearchQuery()
@@ -50,6 +55,9 @@ class FlightSearchViewModel(
             // Trigger search with saved query
             if (query.length >= 2) {
                 _suggestions.value = repository.searchAirportsCombined(query)
+            } else {
+                // If empty query, load favorite destinations
+                loadFavoriteDestinations()
             }
         }
     }
@@ -65,6 +73,37 @@ class FlightSearchViewModel(
                 favoritesMap["${favorite.departureCode}_${favorite.destinationCode}"] = true
             }
             _favorites.value = favoritesMap
+
+            // If search is empty, load favorite destinations
+            if (_searchQuery.value.isEmpty()) {
+                loadFavoriteDestinations(favoritesList)
+            }
+        }
+    }
+
+    /**
+     * Load favorite destinations (departure and destination airports)
+     */
+    private fun loadFavoriteDestinations(favoritesList: List<Favorite>? = null) {
+        viewModelScope.launch {
+            val favorites = favoritesList ?: repository.getAllFavorites()
+
+            // Get all airports to map codes to Airport objects
+            val allAirports = repository.getAllAirports()
+            val airportMap = allAirports.associateBy { it.iataCode }
+
+            // Map each favorite route to pair of airports
+            val favoriteDestinationsList = favorites.mapNotNull { favorite ->
+                val departure = airportMap[favorite.departureCode]
+                val destination = airportMap[favorite.destinationCode]
+                if (departure != null && destination != null) {
+                    Pair(departure, destination)
+                } else {
+                    null
+                }
+            }
+
+            _favoriteDestinations.value = favoriteDestinationsList
         }
     }
 
@@ -82,9 +121,14 @@ class FlightSearchViewModel(
         if (query.length >= 2) {
             viewModelScope.launch {
                 _suggestions.value = repository.searchAirportsCombined(query)
+                _favoriteDestinations.value = emptyList() // Clear favorites when searching
             }
         } else {
             _suggestions.value = emptyList()
+            // Load favorites when search is cleared
+            viewModelScope.launch {
+                loadFavoriteDestinations()
+            }
         }
     }
 
@@ -95,6 +139,7 @@ class FlightSearchViewModel(
         // Don't modify the search query - preserve the user's input
         _selectedAirport.value = airport
         _suggestions.value = emptyList()
+        _favoriteDestinations.value = emptyList() // Clear favorites when viewing flights
 
         viewModelScope.launch {
             _destinations.value = repository.getFlightsFromAirport(airport.id)
@@ -116,8 +161,11 @@ class FlightSearchViewModel(
             // Trigger suggestions with the restored query
             if (savedQuery.length >= 2) {
                 _suggestions.value = repository.searchAirportsCombined(savedQuery)
+                _favoriteDestinations.value = emptyList()
             } else {
                 _suggestions.value = emptyList()
+                // Load favorites when going back with empty search
+                loadFavoriteDestinations()
             }
         }
     }
@@ -135,6 +183,11 @@ class FlightSearchViewModel(
             // Update favorites map
             _favorites.value = _favorites.value.toMutableMap().apply {
                 put(routeKey, isFavorite)
+            }
+
+            // Reload favorite destinations
+            if (_searchQuery.value.isEmpty() && _selectedAirport.value == null) {
+                loadFavoriteDestinations()
             }
         }
     }

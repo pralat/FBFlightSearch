@@ -62,6 +62,7 @@ fun FlightSearchScreen(
     val suggestions by viewModel.suggestions.collectAsState()
     val selectedAirport by viewModel.selectedAirport.collectAsState()
     val destinations by viewModel.destinations.collectAsState()
+    val favoriteDestinations by viewModel.favoriteDestinations.collectAsState()
 
     Scaffold(
         topBar = {
@@ -97,6 +98,17 @@ fun FlightSearchScreen(
                         AirportSuggestions(
                             airports = suggestions,
                             onAirportClick = { viewModel.onAirportSelected(it) }
+                        )
+                    }
+                    favoriteDestinations.isNotEmpty() && searchQuery.isEmpty() && selectedAirport == null -> {
+                        FavoriteDestinationsList(
+                            favoriteDestinations = favoriteDestinations,
+                            onFavoriteClick = { dep, dest ->
+                                viewModel.onToggleFavorite(dep, dest)
+                            },
+                            isRouteFavorited = { dep, dest ->
+                                viewModel.isRouteFavorited(dep, dest)
+                            }
                         )
                     }
                     selectedAirport != null && destinations.isEmpty() -> {
@@ -243,6 +255,49 @@ fun AirportItem(
                     contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
                     tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+        }
+    }
+}
+
+/**
+ * List of saved favorite destinations
+ */
+@Composable
+fun FavoriteDestinationsList(
+    favoriteDestinations: List<Pair<Airport, Airport>>,
+    onFavoriteClick: (String, String) -> Unit,
+    isRouteFavorited: (String, String) -> Boolean
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        Text(
+            text = "Saved Favorites",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        if (favoriteDestinations.isEmpty()) {
+            EmptyState(
+                message = "No saved favorites yet.\nSearch for flights and tap the heart icon to save them."
+            )
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(favoriteDestinations) { (departure, destination) ->
+                    FlightCard(
+                        departure = departure,
+                        destination = destination,
+                        isFavorite = isRouteFavorited(departure.iataCode, destination.iataCode),
+                        onFavoriteClick = {
+                            onFavoriteClick(departure.iataCode, destination.iataCode)
+                        }
+                    )
+                }
             }
         }
     }

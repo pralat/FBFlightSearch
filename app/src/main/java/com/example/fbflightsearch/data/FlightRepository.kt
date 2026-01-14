@@ -44,6 +44,13 @@ class FlightRepository(
     }
 
     /**
+     * Get all airports
+     */
+    suspend fun getAllAirports(): List<Airport> {
+        return airportDao.getAllAirports()
+    }
+
+    /**
      * Get search query from DataStore
      */
     fun getSearchQuery(): Flow<String> {
