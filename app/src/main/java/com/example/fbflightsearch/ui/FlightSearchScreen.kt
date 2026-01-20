@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -391,7 +392,10 @@ fun FlightCard(
             Spacer(modifier = Modifier.weight(1f))
 
             // Destination
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f, fill = false)
+            ) {
                 Text(
                     text = destination.iataCode,
                     style = MaterialTheme.typography.headlineSmall,
@@ -405,12 +409,16 @@ fun FlightCard(
                 )
             }
 
-            // Favorite button
-            IconButton(onClick = onFavoriteClick) {
+            // Favorite button with fixed size
+            IconButton(
+                onClick = onFavoriteClick,
+                modifier = Modifier.size(48.dp)
+            ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-                    tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
