@@ -388,13 +388,7 @@ fun FlightCard(
                 )
             }
 
-            // Arrow icon
-            Icon(
-                imageVector = Icons.Default.Search, // Using search as a placeholder for airplane
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.weight(1f)
-            )
+            Spacer(modifier = Modifier.weight(1f))
 
             // Destination
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
