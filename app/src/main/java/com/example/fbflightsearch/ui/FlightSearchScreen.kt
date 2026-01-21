@@ -376,7 +376,10 @@ fun FlightCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Departure
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = departure.iataCode,
                     style = MaterialTheme.typography.headlineSmall,
@@ -394,7 +397,7 @@ fun FlightCard(
             // Destination
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.weight(1f, fill = false)
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = destination.iataCode,
